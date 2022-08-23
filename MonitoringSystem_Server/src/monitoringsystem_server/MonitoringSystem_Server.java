@@ -4,6 +4,8 @@
  */
 package monitoringsystem_server;
 
+import javax.swing.JFrame;
+
 /**
  *
  * @author nghiadx
@@ -15,6 +17,8 @@ public class MonitoringSystem_Server {
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        JFrame indexFrame = new index();
+        indexFrame.show();
     }
     
 }
