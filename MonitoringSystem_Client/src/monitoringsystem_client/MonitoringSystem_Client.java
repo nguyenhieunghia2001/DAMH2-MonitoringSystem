@@ -4,6 +4,8 @@
  */
 package monitoringsystem_client;
 
+import javax.swing.JFrame;
+
 /**
  *
  * @author nghiadx
@@ -15,6 +17,8 @@ public class MonitoringSystem_Client {
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        JFrame client = new IndexFrame();
+        client.show();
     }
     
 }
