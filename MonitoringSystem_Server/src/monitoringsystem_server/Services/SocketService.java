@@ -4,6 +4,7 @@
  */
 package monitoringsystem_server.Services;
 
+import java.awt.List;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
@@ -14,6 +15,13 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.stream.Collectors;
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
+import javax.swing.JTextPane;
+import javax.swing.ListModel;
 import monitoringsystem_server.ServiceThread;
 
 /**
@@ -21,12 +29,12 @@ import monitoringsystem_server.ServiceThread;
  * @author nghiadx
  */
 public class SocketService {
-
-    public static void Run() throws IOException {
+    
+    public static void Run(JTextPane tpLog, List lClient, ArrayList ClientList) throws IOException {
         ServerSocket listener = null;
-
-        System.out.println("Server is waiting to accept user...");
-        int clientNumber = 1;
+        
+        tpLog.setText("Server is waiting to accept user...");
+        int clientNumber = 0;
 
         // Mở một ServerSocket tại cổng 7777.
         // Chú ý bạn không thể chọn cổng nhỏ hơn 1023 nếu không là người dùng
@@ -37,7 +45,7 @@ public class SocketService {
             System.out.println(e);
             System.exit(1);
         }
-
+        
         try {
             while (true) {
 
@@ -45,6 +53,13 @@ public class SocketService {
                 // Đồng thời nhận được một đối tượng Socket tại server.
                 Socket socketOfServer = listener.accept();
                 new ServiceThread(socketOfServer, clientNumber++).start();
+                
+                String clientName = "client" + clientNumber++;
+                String ip = socketOfServer.getInetAddress() + "/" + socketOfServer.getPort();
+                
+                tpLog.setText(tpLog.getText() + "\nNew " + clientName + ": " + ip);
+                ClientList.add(ip + ":   " + clientName);
+                lClient.add(ip + ":   " + clientName);
             }
         } finally {
             listener.close();

@@ -4,9 +4,16 @@
  */
 package monitoringsystem_server;
 
+import java.awt.List;
 import java.io.IOException;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import javax.swing.JList;
 import monitoringsystem_server.Services.SocketService;
 
 /**
@@ -14,8 +21,9 @@ import monitoringsystem_server.Services.SocketService;
  * @author nghiadx
  */
 public class index extends javax.swing.JFrame {
-
+    
     SocketService _socket;
+    ArrayList<String> clientList = new ArrayList<String>();
 
     /**
      * Creates new form index
@@ -44,11 +52,10 @@ public class index extends javax.swing.JFrame {
         jPanel3 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
-        jButton1 = new javax.swing.JButton();
-        jTextField2 = new javax.swing.JTextField();
-        jButton2 = new javax.swing.JButton();
+        btnSelectClient = new javax.swing.JButton();
+        txtIPCLient = new javax.swing.JTextField();
+        btnSearchClient = new javax.swing.JButton();
+        ClientListUI = new java.awt.List();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -122,7 +129,7 @@ public class index extends javax.swing.JFrame {
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGap(0, 509, Short.MAX_VALUE)
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -144,19 +151,16 @@ public class index extends javax.swing.JFrame {
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Client List"));
 
-        jList1.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
+        btnSelectClient.setText("Select");
+        btnSelectClient.setName("btnSelectClientList"); // NOI18N
+
+        btnSearchClient.setText("Search");
+        btnSearchClient.setName("btnSelectClientList"); // NOI18N
+        btnSearchClient.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSearchClientActionPerformed(evt);
+            }
         });
-        jList1.setName("lClients"); // NOI18N
-        jScrollPane1.setViewportView(jList1);
-
-        jButton1.setText("Select");
-        jButton1.setName("btnSelectClientList"); // NOI18N
-
-        jButton2.setText("Search");
-        jButton2.setName("btnSelectClientList"); // NOI18N
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -165,25 +169,25 @@ public class index extends javax.swing.JFrame {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1)
+                    .addComponent(ClientListUI, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
+                        .addComponent(txtIPCLient, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
                         .addGap(18, 18, 18)
-                        .addComponent(jButton2)
+                        .addComponent(btnSearchClient)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton1)))
+                        .addComponent(btnSelectClient)))
                 .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 323, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(ClientListUI, javax.swing.GroupLayout.PREFERRED_SIZE, 323, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton2))
+                    .addComponent(btnSelectClient)
+                    .addComponent(txtIPCLient, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnSearchClient))
                 .addContainerGap())
         );
 
@@ -224,7 +228,7 @@ public class index extends javax.swing.JFrame {
         Thread th = new Thread() {
             public void run() {
                 try {
-                    _socket.Run();
+                    _socket.Run(tpLog, ClientListUI, clientList);
                 } catch (IOException ex) {
                     Logger.getLogger(index.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -232,6 +236,16 @@ public class index extends javax.swing.JFrame {
         };
         th.start();
     }//GEN-LAST:event_IStartClick
+
+    private void btnSearchClientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchClientActionPerformed
+        // TODO add your handling code here:
+        ClientListUI.clear();
+        for (String clientIp : clientList) {
+            if (clientIp.contains(txtIPCLient.getText())) {
+                ClientListUI.add(clientIp);
+            }
+        }
+    }//GEN-LAST:event_btnSearchClientActionPerformed
 
     /**
      * @param args the command line arguments
@@ -269,20 +283,19 @@ public class index extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
+    private java.awt.List ClientListUI;
+    private javax.swing.JButton btnSearchClient;
+    private javax.swing.JButton btnSelectClient;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JList<String> jList1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
     private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JTextPane tpLog;
+    private javax.swing.JTextField txtIPCLient;
     // End of variables declaration//GEN-END:variables
 }
