@@ -8,6 +8,7 @@ import java.awt.List;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -29,10 +30,12 @@ import monitoringsystem_server.ServiceThread;
  * @author nghiadx
  */
 public class SocketService {
-    
+
     public static void Run(JTextPane tpLog, List lClient, ArrayList ClientList) throws IOException {
         ServerSocket listener = null;
-        
+        DataInputStream ournewDataInputstream;
+        DataOutputStream ournewDataOutputstream;
+
         tpLog.setText("Server is waiting to accept user...");
         int clientNumber = 0;
 
@@ -41,25 +44,63 @@ public class SocketService {
         // đặc quyền (privileged users (root)).
         try {
             listener = new ServerSocket(8888);
+
         } catch (IOException e) {
             System.out.println(e);
             System.exit(1);
         }
-        
+
         try {
             while (true) {
 
                 // Chấp nhận một yêu cầu kết nối từ phía Client.
                 // Đồng thời nhận được một đối tượng Socket tại server.
                 Socket socketOfServer = listener.accept();
+//                ournewDataInputstream = new DataInputStream(socketOfServer.getInputStream());
+//                ournewDataOutputstream = new DataOutputStream(socketOfServer.getOutputStream());
+//
+////                Thread th = new Thread() {
+////                    public void run() {
+////                        try {
+//                InputStream is = socketOfServer.getInputStream();
+//                BufferedReader br = new BufferedReader(new InputStreamReader(is));
+//
+//                OutputStream os = socketOfServer.getOutputStream();
+//                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
+//
+//                String receivedMessage;
+//
+//                do {
+//                    receivedMessage = br.readLine();
+//                    System.out.println("Received : " + receivedMessage);
+//                    if (receivedMessage.equalsIgnoreCase("quit")) {
+//                        System.out.println("Client has left !");
+//                        break;
+//                    } else {
+//                        DataInputStream din = new DataInputStream(System.in);
+//                        String k = din.readLine();
+//                        bw.write(k);
+//                        bw.newLine();
+//                        bw.flush();
+//                    }
+//                } while (true);
+//                bw.close();
+//                br.close();
+//                        } catch (IOException e) {
+//                            System.out.println("Read failed");
+//                            System.exit(-1);
+//                        }
+//                    }
+//                };
+
                 new ServiceThread(socketOfServer, clientNumber++).start();
-                
+
                 String clientName = "client" + clientNumber++;
                 String ip = socketOfServer.getInetAddress() + "/" + socketOfServer.getPort();
-                
+
                 tpLog.setText(tpLog.getText() + "\nNew " + clientName + ": " + ip);
-                ClientList.add(ip + ":   " + clientName);
-                lClient.add(ip + ":   " + clientName);
+                ClientList.add(ip + ":" + clientName);
+                lClient.add(ip + ":" + clientName);
             }
         } finally {
             listener.close();

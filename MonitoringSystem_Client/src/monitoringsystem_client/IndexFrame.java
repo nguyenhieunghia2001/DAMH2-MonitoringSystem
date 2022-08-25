@@ -4,7 +4,12 @@
  */
 package monitoringsystem_client;
 
+import Models.FolderSharing;
+import com.google.gson.Gson;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,13 +20,16 @@ import java.util.logging.Logger;
 public class IndexFrame extends javax.swing.JFrame {
 
     ClientSocket client;
+    FolderSharing _folerSharing;
 
     /**
      * Creates new form IndexFrame
      */
-    public IndexFrame() {
+    public IndexFrame() throws IOException {
         initComponents();
-        client = new ClientSocket();
+        this.client = new ClientSocket();
+        new MonitorFolder(client, "share_1").start();
+        this._folerSharing = new FolderSharing();
     }
 
     /**
@@ -38,12 +46,14 @@ public class IndexFrame extends javax.swing.JFrame {
         txtPort = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         btnDisconnect = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         jLabel1.setText("Client");
 
+        txtPort.setText("8888");
         txtPort.setName("txtPort"); // NOI18N
 
         jButton1.setText("Connect");
@@ -95,25 +105,42 @@ public class IndexFrame extends javax.swing.JFrame {
                 .addContainerGap(10, Short.MAX_VALUE))
         );
 
+        jButton2.setText("test");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(359, 359, 359)
+                .addComponent(jButton2)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 378, Short.MAX_VALUE))
+                .addGap(109, 109, 109)
+                .addComponent(jButton2)
+                .addGap(0, 247, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-        client.connect(Integer.parseInt(txtPort.getText()));
+        try {
+            String folderJson = new Gson().toJson(_folerSharing);
+            client.connect(Integer.parseInt(txtPort.getText()), folderJson);
+        } catch (IOException ex) {
+            Logger.getLogger(IndexFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void btnDisconnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDisconnectActionPerformed
@@ -124,6 +151,11 @@ public class IndexFrame extends javax.swing.JFrame {
             Logger.getLogger(IndexFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnDisconnectActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        client.sendMessage("hello server");
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -155,7 +187,11 @@ public class IndexFrame extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new IndexFrame().setVisible(true);
+                try {
+                    new IndexFrame().setVisible(true);
+                } catch (IOException ex) {
+                    Logger.getLogger(IndexFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
@@ -163,6 +199,7 @@ public class IndexFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDisconnect;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JTextField txtPort;

@@ -1,0 +1,4 @@
+2022/08/25 22:59:51;ENTRY_DELETE;/127.0.0.1:56455;Delete file cc ne.txt
+2022/08/25 22:59:57;ENTRY_CREATE;/127.0.0.1:56455;Create file New Text Document.txt
+2022/08/25 23:00:02;ENTRY_DELETE;/127.0.0.1:56455;Delete file New Text Document.txt
+2022/08/25 23:00:02;ENTRY_CREATE;/127.0.0.1:56455;Create file chot don.txt

@@ -11,7 +11,12 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.file.Path;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -23,13 +28,14 @@ public class ClientSocket {
     Socket socketOfClient = null;
     BufferedWriter os = null;
     BufferedReader is = null;
+    MonitorFolder monitor;
 
-    public ClientSocket() {
+    public ClientSocket() throws IOException {
+//        monitor = new MonitorFolder("share_1");
     }
 
-    public void connect(int port) {
+    public void connect(int port, String folderJson) throws IOException {
         // Địa chỉ máy chủ.
-
         try {
             // Gửi yêu cầu kết nối tới Server đang lắng nghe
             // trên máy 'localhost' cổng 7777.
@@ -51,10 +57,9 @@ public class ClientSocket {
 
         try {
             // Ghi dữ liệu vào luồng đầu ra của Socket tại Client.
-            os.write("HELO! now is " + new Date());
+            os.write("New=="+folderJson);
             os.newLine(); // kết thúc dòng
             os.flush();  // đẩy dữ liệu đi.
-
             // Đọc dữ liệu trả lời từ phía server
             // Bằng cách đọc luồng đầu vào của Socket tại Client.
 //            String responseLine;
@@ -78,6 +83,19 @@ public class ClientSocket {
             socketOfClient.close();
         } catch (UnknownHostException e) {
             System.err.println("Trying to connect to unknown host: " + e);
+        }
+    }
+
+    public void sendMessage(String message) {
+        try {
+            // Ghi dữ liệu vào luồng đầu ra của Socket tại Client.
+            os.write(message);
+            os.newLine(); // kết thúc dòng
+            os.flush();  // đẩy dữ liệu đi.
+        } catch (UnknownHostException e) {
+            System.err.println("Trying to connect to unknown host: " + e);
+        } catch (IOException e) {
+            System.err.println("IOException:  " + e);
         }
     }
 }
