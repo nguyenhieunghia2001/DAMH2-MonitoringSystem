@@ -1,10 +1,12 @@
-2022/08/26 21:55:51;ENTRY_DELETE;/127.0.0.1:63973;Delete file new file 2.txt
-2022/08/26 21:55:51;ENTRY_DELETE;/127.0.0.1:63973;Delete file new file 2.txt
-2022/08/26 21:55:51;ENTRY_CREATE;/127.0.0.1:63973;Create file test1.txtLog
-2022/08/26 21:55:59;ENTRY_DELETE;/127.0.0.1:63973;Delete file filter.txt
-2022/08/26 21:56:20;ENTRY_DELETE;/127.0.0.1:63974;Delete file oke.txt
-2022/08/26 21:56:20;ENTRY_CREATE;/127.0.0.1:63974;Create file test1.txt
-2022/08/26 21:56:37;ENTRY_CREATE;/127.0.0.1:63974;Create file New Text Document.txt
-2022/08/26 21:56:42;ENTRY_DELETE;/127.0.0.1:63974;Delete file New Text Document.txt
-2022/08/26 21:56:42;ENTRY_CREATE;/127.0.0.1:63974;Create file test11111222.txt
-2022/08/26 21:58:25;ENTRY_DELETE;/127.0.0.1:63974;Delete file test11111222.txt
+
+2022/08/26 22:05:34;ENTRY_DELETE;/127.0.0.1:64153;Delete file new disconnect.txt
+2022/08/26 22:05:46;ENTRY_CREATE;/127.0.0.1:64153;Create file New Text Document.txt
+2022/08/26 22:05:50;ENTRY_DELETE;/127.0.0.1:64153;Delete file New Text Document.txt
+2022/08/26 22:05:50;ENTRY_CREATE;/127.0.0.1:64153;Create file new file test.txt
+2022/08/26 22:06:23;ENTRY_CREATE;/127.0.0.1:64154;Create file New Text Document.txt
+2022/08/26 22:06:26;ENTRY_DELETE;/127.0.0.1:64154;Delete file New Text Document.txt
+2022/08/26 22:06:26;ENTRY_CREATE;/127.0.0.1:64154;Create file new file 1.txt
+2022/08/26 22:06:38;ENTRY_DELETE;/127.0.0.1:64154;Delete file new file 1.txt
+2022/08/26 22:08:18;ENTRY_CREATE;/127.0.0.1:64154;Create file New Text Document.txt
+2022/08/26 22:08:23;ENTRY_DELETE;/127.0.0.1:64154;Delete file New Text Document.txt
+2022/08/26 22:08:23;ENTRY_CREATE;/127.0.0.1:64154;Create file new test delete.txt
