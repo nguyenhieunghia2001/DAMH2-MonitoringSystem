@@ -14,8 +14,13 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -28,20 +33,31 @@ public class MonitorFolder extends Thread {
     String _pathFile;
     Path path;
     ClientSocket _client;
+    String _fileName;
+    ArrayList<LogAction> _logList;
+    DefaultTableModel _modelTable;
+    DateFormat dateFormat;
+    CommonService common;
 
-    public MonitorFolder(ClientSocket client, String folderName) throws IOException {
+    public MonitorFolder(ClientSocket client, String folderName, ArrayList<LogAction> logList,
+            DefaultTableModel modelTable) throws IOException {
         watchService = FileSystems.getDefault().newWatchService();
         _pathFile = pathTemplate + folderName;
         path = Paths.get(_pathFile);
         path.register(watchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
         this._client = client;
+        this._fileName = folderName;
+        this._logList = logList;
+        this._modelTable = modelTable;
+        dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        common = new CommonService();
     }
 
     @Override
     public void run() {
         MonitorFolder monitor = null;
         try {
-            monitor = new MonitorFolder(_client, "share_1");
+            monitor = new MonitorFolder(_client, _fileName, _logList, _modelTable);
         } catch (IOException ex) {
             Logger.getLogger(MonitoringSystem_Client.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -62,6 +78,14 @@ public class MonitorFolder extends Thread {
 
                 String log = kind.name() + ":" + fileName;
                 _client.sendMessage("Log==" + log);
+
+                //log table
+                String explain = common.convertMessage(kind.name(), fileName.toString());
+                Date date = new Date();
+                LogAction ac = new LogAction(dateFormat.format(date), kind.name(), explain);
+                Object[] ob = common.newRow(_logList.size() + 1, dateFormat.format(date), kind.name(), explain);
+                _modelTable.addRow(ob);
+                _logList.add(ac);
             }
 
             boolean valid = key.reset();

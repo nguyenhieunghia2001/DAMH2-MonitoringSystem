@@ -1,1 +1,0 @@
-{"FolderSelected":{"FolderName":"share_1","FileName":[]},"FolderList":[{"FolderName":"share_1","FileName":[]},{"FolderName":"share_2","FileName":[]}],"_path":"C:\\Users\\nghiadx\\Desktop\\machine 1"}
