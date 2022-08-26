@@ -1,4 +1,10 @@
-2022/08/25 22:59:51;ENTRY_DELETE;/127.0.0.1:56455;Delete file cc ne.txt
-2022/08/25 22:59:57;ENTRY_CREATE;/127.0.0.1:56455;Create file New Text Document.txt
-2022/08/25 23:00:02;ENTRY_DELETE;/127.0.0.1:56455;Delete file New Text Document.txt
-2022/08/25 23:00:02;ENTRY_CREATE;/127.0.0.1:56455;Create file chot don.txt
+2022/08/26 21:55:51;ENTRY_DELETE;/127.0.0.1:63973;Delete file new file 2.txt
+2022/08/26 21:55:51;ENTRY_DELETE;/127.0.0.1:63973;Delete file new file 2.txt
+2022/08/26 21:55:51;ENTRY_CREATE;/127.0.0.1:63973;Create file test1.txtLog
+2022/08/26 21:55:59;ENTRY_DELETE;/127.0.0.1:63973;Delete file filter.txt
+2022/08/26 21:56:20;ENTRY_DELETE;/127.0.0.1:63974;Delete file oke.txt
+2022/08/26 21:56:20;ENTRY_CREATE;/127.0.0.1:63974;Create file test1.txt
+2022/08/26 21:56:37;ENTRY_CREATE;/127.0.0.1:63974;Create file New Text Document.txt
+2022/08/26 21:56:42;ENTRY_DELETE;/127.0.0.1:63974;Delete file New Text Document.txt
+2022/08/26 21:56:42;ENTRY_CREATE;/127.0.0.1:63974;Create file test11111222.txt
+2022/08/26 21:58:25;ENTRY_DELETE;/127.0.0.1:63974;Delete file test11111222.txt

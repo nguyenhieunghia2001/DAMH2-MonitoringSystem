@@ -4,6 +4,7 @@
  */
 package monitoringsystem_server.Services;
 
+import Models.LogAction;
 import java.awt.List;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -23,6 +24,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JTextPane;
 import javax.swing.ListModel;
+import javax.swing.table.DefaultTableModel;
 import monitoringsystem_server.ServiceThread;
 
 /**
@@ -31,7 +33,8 @@ import monitoringsystem_server.ServiceThread;
  */
 public class SocketService {
 
-    public static void Run(JTextPane tpLog, List lClient, ArrayList ClientList) throws IOException {
+    public static void Run(JTextPane tpLog, List lClient, ArrayList ClientList,
+            ArrayList<LogAction> logList, DefaultTableModel modelTable) throws IOException {
         ServerSocket listener = null;
         DataInputStream ournewDataInputstream;
         DataOutputStream ournewDataOutputstream;
@@ -56,44 +59,13 @@ public class SocketService {
                 // Chấp nhận một yêu cầu kết nối từ phía Client.
                 // Đồng thời nhận được một đối tượng Socket tại server.
                 Socket socketOfServer = listener.accept();
-//                ournewDataInputstream = new DataInputStream(socketOfServer.getInputStream());
-//                ournewDataOutputstream = new DataOutputStream(socketOfServer.getOutputStream());
-//
-////                Thread th = new Thread() {
-////                    public void run() {
-////                        try {
-//                InputStream is = socketOfServer.getInputStream();
-//                BufferedReader br = new BufferedReader(new InputStreamReader(is));
-//
-//                OutputStream os = socketOfServer.getOutputStream();
-//                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
-//
-//                String receivedMessage;
-//
-//                do {
-//                    receivedMessage = br.readLine();
-//                    System.out.println("Received : " + receivedMessage);
-//                    if (receivedMessage.equalsIgnoreCase("quit")) {
-//                        System.out.println("Client has left !");
-//                        break;
-//                    } else {
-//                        DataInputStream din = new DataInputStream(System.in);
-//                        String k = din.readLine();
-//                        bw.write(k);
-//                        bw.newLine();
-//                        bw.flush();
-//                    }
-//                } while (true);
-//                bw.close();
-//                br.close();
-//                        } catch (IOException e) {
-//                            System.out.println("Read failed");
-//                            System.exit(-1);
-//                        }
-//                    }
-//                };
 
-                new ServiceThread(socketOfServer, clientNumber++).start();
+                ServiceThread ser = new ServiceThread(socketOfServer, clientNumber++, logList, modelTable);
+                ser.start();
+
+                //update UI
+                logList = ser.logList;
+                modelTable = ser.modelTable;
 
                 String clientName = "client" + clientNumber++;
                 String ip = socketOfServer.getInetAddress() + "/" + socketOfServer.getPort();

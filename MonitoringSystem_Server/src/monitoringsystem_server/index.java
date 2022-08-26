@@ -4,6 +4,7 @@
  */
 package monitoringsystem_server;
 
+import Models.LogAction;
 import java.awt.List;
 import java.io.IOException;
 import java.util.AbstractMap;
@@ -14,16 +15,23 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.swing.JList;
+import javax.swing.table.DefaultTableModel;
+import monitoringsystem_server.Services.FileDAO;
 import monitoringsystem_server.Services.SocketService;
+import monitoringsystem_server.Services.TableDAO;
 
 /**
  *
  * @author nghiadx
  */
 public class index extends javax.swing.JFrame {
-    
+
     SocketService _socket;
     ArrayList<String> clientList = new ArrayList<String>();
+    ArrayList<LogAction> logList;
+    DefaultTableModel modelTable;
+    TableDAO _tableDAO;
+    FileDAO _fileDAO;
 
     /**
      * Creates new form index
@@ -31,6 +39,16 @@ public class index extends javax.swing.JFrame {
     public index() {
         initComponents();
         _socket = new SocketService();
+        modelTable = (DefaultTableModel) jTable_Log.getModel();
+        logList = new ArrayList<LogAction>();
+        this._tableDAO = new TableDAO();
+        this._fileDAO = new FileDAO();
+        loadLogHistoryFromFile();
+    }
+
+    private void loadLogHistoryFromFile() {
+        logList = _fileDAO.readLogList("LogAction.txt");
+        reLoadTable(logList);
     }
 
     /**
@@ -54,11 +72,14 @@ public class index extends javax.swing.JFrame {
         jPanel4 = new javax.swing.JPanel();
         btnSelectClient = new javax.swing.JButton();
         txtIPCLient = new javax.swing.JTextField();
-        btnSearchClient = new javax.swing.JButton();
         ClientListUI = new java.awt.List();
         jPanel6 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        jTable_Log = new javax.swing.JTable();
+        jPanel7 = new javax.swing.JPanel();
+        txtSearchLog = new javax.swing.JTextField();
+        btnSearchLog = new javax.swing.JButton();
+        cbbType = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -75,15 +96,16 @@ public class index extends javax.swing.JFrame {
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(67, 67, 67))
         );
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         jLabel1.setText("Server");
 
-        jTextField1.setText("port");
+        jTextField1.setText("8888");
         jTextField1.setEnabled(false);
         jTextField1.setName("txtPort"); // NOI18N
         jTextField1.addActionListener(new java.awt.event.ActionListener() {
@@ -136,7 +158,7 @@ public class index extends javax.swing.JFrame {
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 245, Short.MAX_VALUE)
+            .addGap(0, 211, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
@@ -154,12 +176,9 @@ public class index extends javax.swing.JFrame {
 
         btnSelectClient.setText("Select");
         btnSelectClient.setName("btnSelectClientList"); // NOI18N
-
-        btnSearchClient.setText("Search");
-        btnSearchClient.setName("btnSelectClientList"); // NOI18N
-        btnSearchClient.addActionListener(new java.awt.event.ActionListener() {
+        btnSelectClient.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSearchClientActionPerformed(evt);
+                btnSelectClientActionPerformed(evt);
             }
         });
 
@@ -173,9 +192,7 @@ public class index extends javax.swing.JFrame {
                     .addComponent(ClientListUI, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(txtIPCLient, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnSearchClient)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGap(102, 102, 102)
                         .addComponent(btnSelectClient)))
                 .addContainerGap())
         );
@@ -183,42 +200,74 @@ public class index extends javax.swing.JFrame {
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(ClientListUI, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(ClientListUI, javax.swing.GroupLayout.DEFAULT_SIZE, 162, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnSelectClient)
-                    .addComponent(txtIPCLient, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnSearchClient))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(txtIPCLient, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
 
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Monitor System Log"));
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        jTable_Log.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "STT", "Time", "Action", "IP", "Explain"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(jTable_Log);
+
+        btnSearchLog.setText("Search");
+        btnSearchLog.setName("btnSelectClientList"); // NOI18N
+        btnSearchLog.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSearchLogActionPerformed(evt);
+            }
+        });
+
+        cbbType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "All", "Time", "Action", "IP", "Explain" }));
+
+        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
+        jPanel7.setLayout(jPanel7Layout);
+        jPanel7Layout.setHorizontalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addGap(448, 448, 448)
+                .addComponent(cbbType, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(txtSearchLog, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(btnSearchLog)
+                .addGap(24, 24, 24))
+        );
+        jPanel7Layout.setVerticalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtSearchLog, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnSearchLog)
+                    .addComponent(cbbType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane1)
+            .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel6Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 365, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -231,22 +280,20 @@ public class index extends javax.swing.JFrame {
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jPanel6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -262,7 +309,7 @@ public class index extends javax.swing.JFrame {
         Thread th = new Thread() {
             public void run() {
                 try {
-                    _socket.Run(tpLog, ClientListUI, clientList);
+                    _socket.Run(tpLog, ClientListUI, clientList, logList, modelTable);
                 } catch (IOException ex) {
                     Logger.getLogger(index.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -271,15 +318,59 @@ public class index extends javax.swing.JFrame {
         th.start();
     }//GEN-LAST:event_IStartClick
 
-    private void btnSearchClientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchClientActionPerformed
+    private void btnSearchLogActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchLogActionPerformed
+        // TODO add your handling code here:
+        String keySearch = txtSearchLog.getText();
+        String typeSearch = (String) cbbType.getSelectedItem();
+        ArrayList<LogAction> filterLog = new ArrayList<LogAction>();
+        switch (typeSearch) {
+            case "Time":
+                filterLog = (ArrayList<LogAction>) logList.stream()
+                        .filter(n -> n.getTime().contains(keySearch))
+                        .collect(Collectors.toList());
+                break;
+            case "Action":
+                filterLog = (ArrayList<LogAction>) logList.stream()
+                        .filter(n -> n.getAction().contains(keySearch))
+                        .collect(Collectors.toList());
+                break;
+            case "IP":
+                filterLog = (ArrayList<LogAction>) logList.stream()
+                        .filter(n -> n.getIP().contains(keySearch))
+                        .collect(Collectors.toList());
+                break;
+            case "Explain":
+                filterLog = (ArrayList<LogAction>) logList.stream()
+                        .filter(n -> n.getExplain().contains(keySearch))
+                        .collect(Collectors.toList());
+                break;
+            default:
+                filterLog = logList;
+                break;
+        }
+        reLoadTable(filterLog);
+    }//GEN-LAST:event_btnSearchLogActionPerformed
+
+    private void btnSelectClientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectClientActionPerformed
         // TODO add your handling code here:
         ClientListUI.clear();
-        for (String clientIp : clientList) {
-            if (clientIp.contains(txtIPCLient.getText())) {
-                ClientListUI.add(clientIp);
-            }
+        ArrayList<String> filter = (ArrayList<String>) clientList.stream()
+                .filter(n -> n.contains(txtIPCLient.getText()))
+                .collect(Collectors.toList());
+        for (String text : filter) {
+            ClientListUI.add(text);
         }
-    }//GEN-LAST:event_btnSearchClientActionPerformed
+    }//GEN-LAST:event_btnSelectClientActionPerformed
+
+    private void reLoadTable(ArrayList<LogAction> filterLog) {
+        int i = 1;
+        this.modelTable.setRowCount(0);
+        for (LogAction log : filterLog) {
+            Object[] ob = _tableDAO.newRow(i, log.getTime(), log.getAction(), log.getIP(), log.getExplain());
+            this.modelTable.addRow(ob);
+            i++;
+        }
+    }
 
     /**
      * @param args the command line arguments
@@ -318,8 +409,9 @@ public class index extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private java.awt.List ClientListUI;
-    private javax.swing.JButton btnSearchClient;
+    private javax.swing.JButton btnSearchLog;
     private javax.swing.JButton btnSelectClient;
+    private javax.swing.JComboBox<String> cbbType;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -327,12 +419,39 @@ public class index extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable jTable_Log;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JTextPane tpLog;
     private javax.swing.JTextField txtIPCLient;
+    private javax.swing.JTextField txtSearchLog;
     // End of variables declaration//GEN-END:variables
+
+    private void show_table_Log() {
+        LogAction l1 = new LogAction("08-12", "Create", "192,.168.3232:333", "test");
+        LogAction l2 = new LogAction("08-12", "delete", "192,.168.3232:333", "cc");
+        ArrayList<LogAction> list = new ArrayList<>();
+        list.add(l1);
+        list.add(l2);
+
+        DefaultTableModel model = (DefaultTableModel) jTable_Log.getModel();
+
+        Object[] row = new Object[5];
+        for (int i = 0; i < list.size(); i++) {
+            row[0] = i + 1;
+            row[1] = list.get(i).getTime();
+            row[2] = list.get(i).getAction();
+            row[3] = list.get(i).getIP();
+            row[4] = list.get(i).getExplain();
+            model.addRow(row);
+        }
+    }
+
+    public static void setTableLogWhileListen(String no, String time, String action, String Ip, String explain) {
+//        this.modelTable = modelTable;
+//        this.logList = logList;
+    }
 }

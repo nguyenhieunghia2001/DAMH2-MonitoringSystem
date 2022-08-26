@@ -4,10 +4,14 @@
  */
 package monitoringsystem_server.Services;
 
+import Models.LogAction;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +34,7 @@ public class FileDAO {
             closeStream(writer);
         }
     }
-    
+
     public void writeNotReset(String json, String fileName) throws IOException {
         BufferedWriter writer = null;
         try {
@@ -42,6 +46,40 @@ public class FileDAO {
             e.printStackTrace();
         } finally {
             closeStream(writer);
+        }
+    }
+
+    public ArrayList<LogAction> readLogList(String fileName) {
+        ArrayList<LogAction> logList = new ArrayList<LogAction>();
+        BufferedReader b = null;
+        try {
+            File f = new File(fileName);
+            b = new BufferedReader(new FileReader(f));
+            String readLine = "";
+
+            while ((readLine = b.readLine()) != null) {
+                String[] keyValue = readLine.split(";");
+                if (keyValue.length > 1) {
+                    LogAction ac = new LogAction(keyValue[0], keyValue[1], keyValue[2], keyValue[3]);
+                    logList.add(ac);
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            closeStream(b);
+        }
+        return logList;
+    }
+
+    private void closeStream(BufferedReader is) {
+        if (is != null) {
+            try {
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
